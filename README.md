@@ -1,28 +1,39 @@
-# [Click me for the demo](https://agentic-cloudflare-static-site-template.deltadelta.workers.dev/)
+# Last.fm Animated Track Wall
 
-# What is this?
+An animated, vertically scrolling wall of your top Last.fm album art. Add your username to the URL:
 
-This repo is a template that you can give to an AI agent so that you can quickly deploy static websites using a NextJS and Cloudflare Worker stack.
+```
+https://<your-site>/?username=your_username
+```
 
-Your agent should be able to clone this repo, or use it to instantiate a new Github project for you, then guide you on how to get it deployed using Cloudflare.
+⚠️ This app is vibe-coded ⚠️
 
-# Rationale
+This is a static Next.js site (`output: "export"`) served by a Cloudflare Worker. It calls the Last.fm [`user.getTopAlbums`](https://www.last.fm/api/show/user.getTopAlbums) API straight from the browser (top 100 albums over the last 12 months).
 
-This project is a spin-off from an internal project I built at the last company I was working at. We needed a super simple and cheap way for non-engineering staff to be able to experiment and deploy vibe-coded applications safely, and with minimal overhead to the engineering team.
+## API key
 
-As a devops engineer, all I need to do is:
-1. Give this template to the vibe-coder
-2. Create a Cloudflare application for this repo and hook it up to a domain/Cloudflare Access
+There is no server, so the Last.fm API key is inlined into the JavaScript bundle at **build time** from `NEXT_PUBLIC_LASTFM_API_KEY`. Last.fm keys are read-only, but anyone can see the key in the page source.
 
-# Limitations
+- Cloudflare: set `NEXT_PUBLIC_LASTFM_API_KEY` as a build variable (Worker > Settings > Build > Variables and secrets), then redeploy.
+- Locally: create `.env.local` containing `NEXT_PUBLIC_LASTFM_API_KEY=your_key_here`.
 
-This repo is meant to be an exceptionally lean implementation of this type of workflow, so the only sites you can deploy here must be static. For example, with the NextJS directive `output: "export"`.
+Get a key at https://www.last.fm/api/account/create.
 
-# How to use
+## Run locally
 
-> You can send this repo to your agent. If necessary, just point it to the AGENTS.md file.
+1. `npm install`
+2. Create `.env.local` as above.
+3. `npm run dev`, then open `http://localhost:3000/?username=your_username`
 
-1. Set up the connection between Github and Cloudflare. This can be done by going to the Cloudflare Web console > Workers > Create application > Github. Then follow the prompts.
-2. Create a new Github repo by using this as a template.
-3. Go to the Cloudflare Web console > Workers > Create application > Github, and then pick your new repo.
-4. Follow the prompts, then enable the workers domain and your application will be live at `.workers.dev`!
+## Other commands
+
+- `npm run build` builds the static site to `out/`.
+- `npm run preview` builds, then serves `out/` with `wrangler dev`.
+- `npm run deploy` deploys by hand with `wrangler deploy`.
+
+## Layout
+
+- `app/page.tsx` and `components/WallPage.tsx`: main page (intro screen or track wall, chosen by `?username=`).
+- `components/TrackWallClient.tsx`: fetches albums, shuffles them and splits them into columns.
+- `components/AlbumArtColumn.tsx`: one scrolling column.
+- `services/lastfmService.ts`: Last.fm API call.

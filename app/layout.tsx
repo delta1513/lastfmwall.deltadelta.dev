@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
 import "./globals.css";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "NextJS + Cloudflare Workers template",
-  description: "A template for deploying static NextJS sites to Cloudflare Workers.",
+  title: "Last.fm Animated Track Wall",
+  description: "Animated wall of your top album art from Last.fm",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-black">{children}</body>
     </html>
   );
 }
