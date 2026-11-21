@@ -5,24 +5,13 @@ import AlbumArtColumn from './AlbumArtColumn';
 import LoadingState from './LoadingState';
 import type { LastFmTrack } from '@/types';
 import { getTopTracks } from '@/services/lastfmService';
-
-const buildColumns = (tracks: LastFmTrack[]): LastFmTrack[][] => {
-  if (!tracks.length) return [];
-
-  const shuffledTracks = [...tracks].sort(() => 0.5 - Math.random());
-  const extendedTracks = [...shuffledTracks, ...shuffledTracks.slice(0, 20)];
-
-  const numColumns = window.innerWidth < 768 ? 3 : 5;
-  const columnsData: LastFmTrack[][] = Array.from({ length: numColumns }, () => []);
-
-  extendedTracks.forEach((track, index) => {
-    columnsData[index % numColumns].push(track);
-  });
-
-  return columnsData;
-};
+import { buildColumns } from '@/lib/buildColumns';
+import { useWakeLock } from '@/hooks/useWakeLock';
 
 export default function TrackWallClient({ username }: { username: string }) {
+  // Keep the display on for as long as the wall is open.
+  useWakeLock();
+
   const [columns, setColumns] = useState<LastFmTrack[][]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +22,7 @@ export default function TrackWallClient({ username }: { username: string }) {
       setError(null);
       try {
         const fetchedTracks = await getTopTracks(username);
-        setColumns(buildColumns(fetchedTracks));
+        setColumns(buildColumns(fetchedTracks, window.innerWidth < 768 ? 3 : 5));
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
