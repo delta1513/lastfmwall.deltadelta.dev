@@ -47,6 +47,8 @@ The Next.js version in this repository is new. It has breaking changes. Your tra
 | `package-lock.json` | Locked dependency versions. Commit it. |
 | `tsconfig.json` | TypeScript settings. The `@/*` alias points to the repository root. |
 | `eslint.config.mjs` | Lint rules |
+| `tests/` | Unit tests (Vitest). Config is in `vitest.config.mts`. |
+| `lib/`, `hooks/` | Pure logic (`buildColumns`) and React hooks (`useWakeLock`) |
 | `out/` | Build output. Git ignores it. Do not edit it. |
 
 ## 4. Commands
@@ -57,6 +59,7 @@ The Next.js version in this repository is new. It has breaking changes. Your tra
 | `npm run dev` | Start the local dev server |
 | `npm run build` | Build the static site to `out/` |
 | `npm run lint` | Run ESLint |
+| `npm test` | Run the unit tests (Vitest) |
 | `npm run preview` | Build, then serve `out/` with `wrangler dev` |
 | `npm run deploy` | Deploy by hand with `wrangler deploy` |
 
@@ -138,14 +141,16 @@ Cloudflare documentation exists in markdown form. Add `index.md` to the end of a
 Do these checks in order. Fix each problem before you go to the next check.
 
 1. Run `npm run lint`. It must pass.
-2. Run `npm run build`. It must pass, and `out/index.html` must exist.
-3. Run `npx wrangler deploy --dry-run`. It must show that it read the files from the assets folder.
-4. Run `git status`. Make sure that no `out/`, `node_modules/`, `.env`, or `.wrangler/` files are staged.
+2. Run `npm test`. All unit tests must pass. Do not skip, delete, or weaken a test to make it pass. If you change behavior, update or add tests in `tests/`.
+3. Run `npm run build`. It must pass, and `out/index.html` must exist.
+4. Run `npx wrangler deploy --dry-run`. It must show that it read the files from the assets folder.
+5. Run `git status`. Make sure that no `out/`, `node_modules/`, `.env`, or `.wrangler/` files are staged.
 
 Optional: run `npm run preview` and open the local address. This shows the site in the Workers runtime. If you cannot open a browser, skip this step.
 
 ## 10. Git rules
 
+- Run `npm test` before every push to `main`. Do not push if any test fails.
 - Push directly to `main`. This is a hobby project. No pull request is necessary. The user can tell you to use a branch or a pull request instead.
 - Never force-push. Never rewrite history. Never use `git push --force` or `git reset --hard` on shared history.
 - Keep the git history. Add new commits.
